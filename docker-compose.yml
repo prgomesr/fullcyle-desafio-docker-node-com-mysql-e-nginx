@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  node:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: fullcycle/node
+    container_name: node
+    restart: always
+    command: [ "/wait-for-it.sh", "db:3306", "-t", "30", "--" , "node", "index.js" ]
+    depends_on:
+      - db
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - node-network
+
+  db:
+    image: mysql:5.7
+    container_name: db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nodedb
+    volumes:
+      - ./mysql:/var/lib/mysql
+    networks:
+      - node-network
+
+  node-nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: node-nginx
+    networks:
+      - node-network
+    ports:
+      - "8080:80"
+    depends_on:
+     - node
+
+networks:
+  node-network:
+    driver: bridge
