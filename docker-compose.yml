@@ -24,7 +24,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: nodedb
     volumes:
-      - ./mysql:/var/lib/mysql
+      - ./mysql/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ./mysql/data:/var/lib/mysql
     networks:
       - node-network
 
